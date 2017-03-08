@@ -27,7 +27,7 @@ stddevPercentCol = zeros(length(TC_files),1);
 for fi = 1:length(TC_files)
     path = [main,'\',TC_files(fi,:),'\'];
     tiles = dir([path,'Da*.jpg']);
-    im_res      = 0.253;                    % microns per pixel (length)
+    im_res      = 0.253;                    % microns per pixel (length)gnu
     pixel_area  = im_res^2;                 % microns^2 per pixel
     
     for ni = 1:length(tiles)
