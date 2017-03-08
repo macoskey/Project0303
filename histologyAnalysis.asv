@@ -12,7 +12,7 @@
 %% TRI-CHROME COLLAGEN
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-files = ['CO1_tri';...
+TC_files = ['CO1_tri';...
          'S02_tri';...
          'S04_tri';...
          'S06_tri';...
@@ -21,19 +21,19 @@ files = ['CO1_tri';...
          'S11_tri';...
          'S14_tri';...
          ];
-meanPercentCol = zeros(length(files),1);
-stddevPercentCol = zeros(length(files),1);
+meanPercentCol = zeros(length(TC_files),1);
+stddevPercentCol = zeros(length(TC_files),1);
 
-for fi = 1:length(files)
-    path = [main,'\',files(fi,:),'\'];
+for fi = 1:length(TC_files)
+    path = [main,'\',TC_files(fi,:),'\'];
     tiles = dir([path,'Da*.jpg']);
     im_res      = 0.253;                    % microns per pixel (length)
     pixel_area  = im_res^2;                 % microns^2 per pixel
     
     for ni = 1:length(tiles)
-        disp(['Evaluating ',files(fi,:),' tile ',num2str(ni)])
+        disp(['Evaluating ',TC_files(fi,:),' tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        if strcmp(files(fi,:),'S04_tri') == 1
+        if strcmp(TC_files(fi,:),'S04_tri') == 1
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_lite(I);
         else
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_norm(I);
@@ -45,13 +45,13 @@ for fi = 1:length(files)
     meanPercentCol(fi,1) = mean([tiles.collagenPercent]);
     stddevPercentCol(fi,1) = std([tiles.collagenPercent]);
     disp('saving...')
-    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',files(fi,:),'_struct.mat'],'tiles')
+    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',TC_files(fi,:),'_struct.mat'],'tiles')
 end
 
 %% RETICULIN
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-files = ['CO1_ret';...
+RT_files = ['CO1_ret';...
          'S02_ret';...
          'S04_ret';...
          'S06_ret';...
@@ -60,17 +60,17 @@ files = ['CO1_ret';...
          'S11_ret';...
          'S14_ret';...
          ];
-meanPercentRet = zeros(length(files),1);
-stddevPercentRet = zeros(length(files),1);
+meanPercentRet = zeros(length(RT_files),1);
+stddevPercentRet = zeros(length(RT_files),1);
 
-for fi = 1:length(files)
-     path = [main,'\',files(fi,:),'\'];
+for fi = 1:length(RT_files)
+     path = [main,'\',RT_files(fi,:),'\'];
      tiles = dir([path,'Da*.jpg']);
      im_res      = 0.253;                    % microns per pixel (length)
      pixel_area  = im_res^2;                 % microns^2 per pixel
 
      for ni = 1:length(tiles)
-         disp(['Evaluating ',files(fi,:),' tile ',num2str(ni)])
+         disp(['Evaluating ',RT_files(fi,:),' tile ',num2str(ni)])
          I = imread([path,tiles(ni).name]);
          [tiles(ni).reticulinBW,tiles(ni).reticulinRGB] = createReticulinMask(I);
          tiles(ni).reticulinCount   = sum(sum(tiles(ni).reticulinBW));
@@ -80,15 +80,27 @@ for fi = 1:length(files)
      meanPercentRet(fi,1) = mean([tiles.reticulinPercent]);
      stddevPercentRet(fi,1) = std([tiles.reticulinPercent]);
      disp('saving...')
-     save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',files(fi,:),'_struct.mat'],'tiles')
+     save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',RT_files(fi,:),'_struct.mat'],'tiles')
 end
      
 %% RELOAD DATA
-for fi = 1:length(files)
-   path =  
-    
-end
+meanPercentCol = zeros(length(TC_files),1); stddevPercentCol = zeros(length(TC_files),1);
+meanPercentRet = zeros(length(RT_files),1); stddevPercentRet = zeros(length(RT_files),1);
+reload_main = 'E:\Research\Studies\Histology\DopBck_Study\Structures';
 
+for fi = 1:length(TC_files)
+    fprintf('loading file %.1d of %.1d... \n',fi,length(TC_files))
+    TC_path = [reload_main,'\',TC_files(fi,:),'_struct.mat'];
+    RT_path = [reload_main,'\',RT_files(fi,:),'_struct.mat'];
+    TC_tmp = load(TC_path); RT_tmp = load(RT_path);
+    for si = 1:length(TC_tmp.tiles)
+        meanPercentCol(fi,1) = meanPercentCol(fi,1) + TC_tmp.tiles(si).collagenPercent;
+        meanPercentRet(fi,1) = meanPercentRet(fi,1) + RT_tmp.tiles(si).reticulinPercent;
+    end
+    meanPercentCol(fi,1) = meanPercentCol(fi,1)./si;
+    meanPercentRet(fi,1) = meanPercentRet(fi,1)./si;
+end
+fprintf('complete \n')
 %% CELL COUNT FIGURE
 
 meanCells   = [149.9 108.4 36.7 44.2 4.5 0.4 0.5 0];        % from Excel sheet
@@ -96,22 +108,20 @@ stddevCells = [12.54 18.08 44.87 33.15 10.06 1.26 1.58 0];  % from Excel sheet
 dose = [0 30 60 100 200 300 500 1000];
 
 % least-squares curve fit
-fun = @(x,xdata)x(1)*exp(x(2)*xdata);
 x0 = [200,-0.1];
-x = lsqcurvefit(fun,x0,dose,meanCells);
-dose_fit = dose(1):1:dose(end);
-cellfit = fun(x,dose_fit);
+[doseFit,cellFit] = nls_curve(dose,meanCells,x0);
 
 % residuals
 datamean = mean(meanCells);
 SStot = sum((meanCells - datamean).^2);
-SSreg = sum((cellfit(dose + 1) - datamean).^2);
-SSres = sum((meanCells - cellfit(dose + 1)).^2);
+SSreg = sum((cellFit(dose + 1) - datamean).^2);
+SSres = sum((meanCells - cellFit(dose + 1)).^2);
 Rsq = 1 - SSres/SStot;
 
 figure(500), clf, set(500,'Position',[546 336 1100 411])
-plot(dose_fit,cellfit,'LineWidth',3)
-hold on, err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
+plot(doseFit,cellFit,'LineWidth',3), hold on
+plot(dose,meanCells,'.','MarkerSize',40)
+% err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
 
 title 'Non-Lysed Cells Remaining Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Cells per Tile'
@@ -120,29 +130,31 @@ xtick([0 30 60 100 200 300 500 1000])
 ytick([0 40 80 120 160])
 set(gca,'FontSize',14)
 
-legend('Nonlinear least-squares fit','Count \pm \sigma')
+%legend('Nonlinear least-squares fit','Count \pm \sigma')
 text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
 
 %% RETICULIN FIGURE
 retData = meanPercentRet'.*100;
 retStddev = stddevPercentRet.*100';
+dose = [0 30 60 100 200 300 500 1000];
 
 % least-squares curve fit
 fun = @(x,xdata)x(1)*exp(x(2)*xdata);
 x0 = [.01,0];
 x = lsqcurvefit(fun,x0,dose,retData);
-dose_fit = dose(1):1:dose(end);
-retfit = fun(x,dose_fit);
+doseFit = dose(1):1:dose(end);
+retFit = fun(x,doseFit);
+[
 
 % residuals
 datamean = mean(retData);
 SStot = sum((retData - datamean).^2);
-SSreg = sum((retfit(dose + 1) - datamean).^2);
-SSres = sum((retData - retfit(dose + 1)).^2);
+SSreg = sum((retFit(dose + 1) - datamean).^2);
+SSres = sum((retData - retFit(dose + 1)).^2);
 Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
-plot(dose_fit,retfit,'LineWidth',3)
+plot(doseFit,retFit,'LineWidth',3)
 hold on, err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
@@ -159,13 +171,14 @@ text(700,0.75,['R^2 = ',num2str(Rsq)],'FontSize',12);
 %% COLLAGEN FIGURE
 colData = meanPercentCol'.*100;
 colStddev = stddevPercentCol.*100';
+dose = [0 30 60 100 200 300 500 1000];
 
 % least-squares curve fit
 fun = @(x,xdata)x(1)*exp(x(2)*xdata);
 x0 = [.01,0];
 x = lsqcurvefit(fun,x0,dose,colData);
-dose_fit = dose(1):1:dose(end);
-colfit = fun(x,dose_fit);
+doseFit = dose(1):1:dose(end);
+colfit = fun(x,doseFit);
 
 % residuals
 datamean = mean(colData);
@@ -175,7 +188,7 @@ SSres = sum((colData - colfit(dose + 1)).^2);
 Rsq = 1 - SSres/SStot;
 
 figure(700), clf, set(700,'Position',[546 336 1100 411])
-plot(dose_fit,colfit,'LineWidth',3)
+plot(doseFit,colfit,'LineWidth',3)
 hold on, err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Collagen Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
@@ -192,14 +205,14 @@ figure(800), clf, set(800,'Position',[546 336 700 411]), set(gca,'FontSize',14)
 set(gca,'xscale','log')
 xlabel 'Pulse Number'
 yyaxis left
-    plot(dose_fit,cellfit,'LineWidth',2), hold on
+    plot(doseFit,cellFit,'LineWidth',2), hold on
     ylabel 'Cells Remaining'
     ylim([0 170])
     ytick([0 40 80 120 160])
     
 yyaxis right
-    plot(dose_fit,retfit,'LineWidth',2)
-    plot(dose_fit,colfit,'LineWidth',2)
+    plot(doseFit,retFit,'LineWidth',2)
+    plot(doseFit,colfit,'LineWidth',2)
     ylim([0 2.5])
     ytick([0 1 2 3])
     ylabel 'Percent Area Coverage'
