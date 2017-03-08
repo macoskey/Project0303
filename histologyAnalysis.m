@@ -150,8 +150,9 @@ SSres = sum((retData - retFit(dose + 1)).^2);
 Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
-plot(doseFit,retFit,'LineWidth',3)
-hold on, err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
+plot(doseFit,retFit,'LineWidth',3), hold on
+plot(dose,retData,'.','MarkerSize',40);
+% err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 5])
@@ -180,8 +181,9 @@ SSres = sum((colData - colFit(dose + 1)).^2);
 Rsq = 1 - SSres/SStot;
 
 figure(700), clf, set(700,'Position',[546 336 1100 411])
-plot(doseFit,colFit,'LineWidth',3)
-hold on, err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
+plot(doseFit,colFit,'LineWidth',3), hold on
+plot(dose,colData,'.','MarkerSize',40);
+% err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Collagen Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 6])
