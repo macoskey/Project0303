@@ -127,8 +127,8 @@ SSres = sum(sum((meanCells - cellFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(500), clf, set(500,'Position',[546 336 1100 411])
-plot(doseFit,cellFit,'k-','LineWidth',3), hold on
-plot(dose,meanCells,'.','MarkerSize',20,'Color','k')
+plot(doseFit,cellFit,'LineWidth',3), hold on
+plot(dose,meanCells,'.','MarkerSize',40,'Color','o')
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
 
 title 'Non-Lysed Cells Remaining Throughout Treatment'
@@ -140,7 +140,6 @@ set(gca,'FontSize',14)
 
 legend('Nonlinear least-squares fit','Count \pm \sigma')
 text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
-text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
 retData = meanPercentRet'.*100;
