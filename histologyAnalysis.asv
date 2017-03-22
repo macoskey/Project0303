@@ -12,28 +12,42 @@
 %% TRI-CHROME COLLAGEN
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-TC_files = ['CO1_tri';...
-         'S02_tri';...
-         'S04_tri';...
-         'S06_tri';...
-         'S08_tri';...
-         'S10_tri';...
-         'S11_tri';...
-         'S14_tri';...
-         ];
-meanPercentCol = zeros(length(TC_files),1);
-stddevPercentCol = zeros(length(TC_files),1);
+% I know this is awful - get over it:
+% TC_files = ['CO1';'CO2';'CO3';'CO4';'CO5';'CO6';...
+%             'S02';'S04';'S06';'S08';'S10';'S11';...
+%             'S14';'S15';'S17';'S20';'S21';'S23';...
+%             'S25';'S28';'S16';'S18';'S38';'S22';...
+%             'S24';'S26';'S30';'S32';'S35';'S39';...
+%             'S40';'S43';'S44';'S31';'S48';'S36';...
+%             'S52';'S41';'S57';'S45';'S46';'S49';...
+%             'S50';'S53';'S55';'S58';'S60';'S62';...
+%             ];
 
-for fi = 1:length(TC_files)
-    path = [main,'\',TC_files(fi,:),'\'];
+files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
+         'S04';	'S17'; 'S18'; 'S35'; 'S36'; 'S50';...
+         'S06'; 'S20'; 'S38'; 'S39'; 'S52'; 'S53';...
+         'S08';	'S21'; 'S22'; 'S40'; 'S41'; 'S55';... 
+         'S10'; 'S23'; 'S24'; 'S43'; 'S57';	'S58';... 
+         'S11'; 'S25'; 'S26'; 'S44'; 'S45'; 'S60';... 
+         'S14'; 'S28'; 'S30'; 'S31'; 'S46';	'S62';... 
+         'CO1'; 'CO2'; 'CO3'; 'CO4'; 'CO5'; 'CO6';...
+         ];
+fileKey = repmat([30 60 100 200 300 500 1000 0]',6,1);
+
+
+meanPercentCol = zeros(length(files),1);
+stddevPercentCol = zeros(length(files),1);
+
+for fi = 1:length(files)
+    path = [main,'\',files(fi,:),'_tri\'];
     tiles = dir([path,'Da*.jpg']);
     im_res      = 0.253;                    % microns per pixel (length)gnu
     pixel_area  = im_res^2;                 % microns^2 per pixel
     
     for ni = 1:length(tiles)
-        disp(['Evaluating ',TC_files(fi,:),' tile ',num2str(ni)])
+        disp(['Evaluating ',files(fi,:),'_tri tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        if strcmp(TC_files(fi,:),'S04_tri') == 1
+        if strcmp(files(fi,:),'S04') == 1
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_lite(I);
         else
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_norm(I);
@@ -45,7 +59,7 @@ for fi = 1:length(TC_files)
     meanPercentCol(fi,1) = mean([tiles.collagenPercent]);
     stddevPercentCol(fi,1) = std([tiles.collagenPercent]);
     disp('saving...')
-    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',TC_files(fi,:),'_struct.mat'],'tiles')
+    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',files(fi,:),'_tri_struct.mat'],'tiles')
 end
 
 %% RETICULIN
@@ -127,8 +141,8 @@ SSres = sum(sum((meanCells - cellFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(500), clf, set(500,'Position',[546 336 1100 411])
-plot(doseFit,cellFit,'LineWidth',3), hold on
-plot(dose,meanCells,'.','MarkerSize',40,'Color','o')
+plot(doseFit,cellFit,'k-','LineWidth',3), hold on
+plot(dose,meanCells,'.','MarkerSize',20,'Color','k')
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
 
 title 'Non-Lysed Cells Remaining Throughout Treatment'
@@ -140,6 +154,7 @@ set(gca,'FontSize',14)
 
 legend('Nonlinear least-squares fit','Count \pm \sigma')
 text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
 retData = meanPercentRet'.*100;
