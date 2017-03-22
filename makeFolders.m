@@ -1,4 +1,5 @@
 % script to automatically make folders - for the lazy
+% change the loop indices to change the file names
 home = cd;
 cd E:\Research\Studies\Histology\DopBck_Study\TiledSamples
 for fi = 15:62
