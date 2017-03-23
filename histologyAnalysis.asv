@@ -147,8 +147,8 @@ text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
 text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
-retData = meanPercentRet'.*100;
-retStddev = stddevPercentRet.*100';
+
+retData = reshape(meanPercentRet,8,6).*100;
 dose = [0 30 60 100 200 300 500 1000];
 
 % least-squares curve fit
