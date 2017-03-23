@@ -149,23 +149,24 @@ text(700,10,'n = 6','FontSize',12);
 %% RETICULIN FIGURE
 
 retData = circshift(reshape(meanPercentRet,8,6).*100,1,1);
-retdose = [30 60 100 200 300 500 1000 0];
-retdose2 = circshift(repmat(retdose',1,6),1,1);
+retDose = [30 60 100 200 300 500 1000 0];
+retDose2 = circshift(repmat(retDose',1,6),1,1);
 
 % least-squares curve fit
 x0 = [0.1,0];
-[doseFit,retFit] = nls_curve(retdose2,retData,x0);
+[doseFit,retFit] = nls_curve(retDose2,retData,x0);
 
 % residuals
 datamean = mean(mean(retData));
-SStot = sum((retData - datamean).^2);
-SSreg = sum((retFit(retdose + 1) - datamean).^2);
-SSres = sum((retData - retFit(retdose + 1)).^2);
+SStot = sum(sum((retData - datamean).^2));
+SSreg = sum((retFit(retDose + 1) - datamean).^2);
+retFit2 = retFit(ones(1,6),dose + 1)';
+SSres = sum(sum((retData - retFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
-plot(doseFit,retFit,'LineWidth',3), hold on
-plot(retdose,retData,'.','MarkerSize',40);
+plot(doseFit,retFit,'k-','LineWidth',3), hold on
+plot(retDose,retData,'.','MarkerSize',40);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
@@ -179,19 +180,19 @@ text(700,0.75,['R^2 = ',num2str(Rsq)],'FontSize',12);
 
 
 %% COLLAGEN FIGURE
-colData = meanPercentCol'.*100;
-colStddev = stddevPercentCol.*100';
-dose = [0 30 60 100 200 300 500 1000];
+colData = circshift(reshape(meanPercentCol,8,6).*100,1,1);
+colDose2 = retDose2;
 
 % least-squares curve fit
 x0 = [.01,0];
-[doseFit,colFit] = nls_curve(dose,colData,x0);
+[doseFit,colFit] = nls_curve(colDose2,colData,x0);
 
 % residuals
-datamean = mean(colData);
-SStot = sum((colData - datamean).^2);
+datamean = mean(mean(colData));
+SStot = sum(sum((colData - datamean).^2));
 SSreg = sum((colFit(dose + 1) - datamean).^2);
-SSres = sum((colData - colFit(dose + 1)).^2);
+colFit2 = colFit(ones(1,6),dose + 1)';
+SSres = sum(sum((colData - colFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(700), clf, set(700,'Position',[546 336 1100 411])

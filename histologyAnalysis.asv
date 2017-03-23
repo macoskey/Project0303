@@ -148,23 +148,24 @@ text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
 
-retData = reshape(meanPercentRet,8,6).*100;
-dose = [0 30 60 100 200 300 500 1000];
+retData = circshift(reshape(meanPercentRet,8,6).*100,1,1);
+retdose = [30 60 100 200 300 500 1000 0];
+retdose2 = circshift(repmat(retdose',1,6),1,1);
 
 % least-squares curve fit
-x0 = [.01,0];
-[doseFit,retFit] = nls_curve(dose,retData,x0);
+x0 = [0.1,0];
+[doseFit,retFit] = nls_curve(retdose2,retData,x0);
 
 % residuals
-datamean = mean(retData);
-SStot = sum((retData - datamean).^2);
-SSreg = sum((retFit(dose + 1) - datamean).^2);
-SSres = sum((retData - retFit(dose + 1)).^2);
+datamean = mean(mean(retData));
+SStot = sum(sum((retData - datamean).^2));
+SSreg = sum((retFit(retdose + 1) - datamean).^2);
+SSres = sum(sum((retData - retFit(retdose + 1)).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
 plot(doseFit,retFit,'LineWidth',3), hold on
-plot(dose,retData,'.','MarkerSize',40);
+plot(retdose,retData,'.','MarkerSize',40);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
