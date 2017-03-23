@@ -24,6 +24,18 @@ TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
          ];
 fileKey = repmat([30 60 100 200 300 500 1000 0]',6,1);
 
+% due to inconsistent histology protocol (both with staining and
+% potentially scanning), multiple color thresholders had to be made to
+% account for variabilities in the color spectra of the various samples.
+maskKey = [1  1	 1	1	3	3	
+    2	4	1	1	4	1
+    1	1	3	4	6	6
+    1	1	5	1	5	1
+    1	1	5	1	6	7
+    8	1	1	1	1	1
+    1	1	1	1	1	3
+    1	1	1	1	1	1]';
+maskKey = maskKey(:);
 
 meanPercentCol = zeros(length(TC_files),1);
 stddevPercentCol = zeros(length(TC_files),1);
@@ -37,11 +49,7 @@ for fi = 1:length(TC_files)
     for ni = 1:length(tiles)
         disp(['Evaluating ',TC_files(fi,:),'_tri tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        if strcmp(TC_files(fi,:),'S04') == 1
-            [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_lite(I);
-        else
-            [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_norm(I);
-        end
+        eval(sprintf('tiles(%.1d).collagenBW,tiles(%.1d).collagenRGB = createCollagenMask%.1d(I);',ni,ni,maskKey(ni)));
         tiles(ni).collagenCount   = sum(sum(tiles(ni).collagenBW));
         tiles(ni).collagenPercent = tiles(ni).collagenCount./(1024*1024);
         tiles(ni).collagenArea    = tiles(ni).collagenCount.*pixel_area;

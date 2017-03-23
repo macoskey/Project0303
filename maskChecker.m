@@ -34,7 +34,7 @@ for fi = 1:length(TC_files)
 end
 
 %%
-fi = 17;
+fi = 42;
 path = [main,'\',TC_files(fi,:),'_tri\'];
 I = imread([path,tiles(randi([1 225],1)).name]);
 [bw,rgb] = createCollagenMask3(I);
