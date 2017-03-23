@@ -231,21 +231,6 @@ legend('Cell Count','Reticulin Area','Collagen Area','Location','SW');
 title 'Comparison of Histological Changes Throughout Treatment'
 
 
-%%
-%{
-cells = [130	174	148	149	145	142	154	158	161	138;	
-         104	126	95	88	127	122	128	120	82	92;	
-         77	    3	115	106	2	6	7	5	20	26;
-         2	    114	51	32	31	47	23	13	82	47;
-         0	    5	0	0	0	8	32	0	0	0;
-         0	    4	0	0	0	0	0	0	0	0;
-         0	    0	0	5	0	0	0	0	0	0;
-         0	    0	0	0	0	0	0	0	0	0];
-%}
-
-
-
-
 
 
 

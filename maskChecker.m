@@ -7,6 +7,8 @@
 %
 % Created: 3/21/17
 
+
+
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
 
 %% col/tri
@@ -31,6 +33,15 @@ for fi = 1:length(TC_files)
     pause;
 end
 
+%%
+fi = 48;
+path = [main,'\',TC_files(fi,:),'_tri\'];
+I = imread([path,tiles(randi([1 225],1)).name]);
+[bw,rgb] = createCollagenMask_norm(I);
+subplot(121), imagesc(I), axis equal tight
+subplot(122), imagesc(rgb), axis equal tight
+title(TC_files(fi,:),'FontSize',24)
+
 
 %% ret
 RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
@@ -49,10 +60,19 @@ for fi = 1:length(RT_files)
     I = imread([path,tiles(randi([1 225],1)).name]);
     [bw,rgb] = createReticulinMask(I);
     subplot(121), imagesc(I), axis equal tight
-    subplot(122), imagesc(rgb), axis equal tight
+    subplot(122), imagesc(bw), axis equal tight
     title(RT_files(fi,:))
+    pause;
 end
 
+%%
+fi = 47;
+path = [main,'\',RT_files(fi,:),'_ret\'];
+I = imread([path,tiles(randi([1 225],1)).name]);
+[bw,rgb] = createReticulinMask(I);
+subplot(121), imagesc(I), axis equal tight
+subplot(122), imagesc(bw), colormap gray, axis equal tight
+title(RT_files(fi,:),'FontSize',24)
 
 
 
