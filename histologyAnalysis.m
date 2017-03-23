@@ -27,7 +27,7 @@ fileKey = repmat([30 60 100 200 300 500 1000 0]',6,1);
 % due to inconsistent histology protocol (both with staining and
 % potentially scanning), multiple color thresholders had to be made to
 % account for variabilities in the color spectra of the various samples.
-maskKey = [1  1	 1	1	3	3	
+maskKeyCol = [1  1	 1	1	3	3	
     2	4	1	1	4	1
     1	1	3	4	6	6
     1	1	5	1	5	1
@@ -35,7 +35,7 @@ maskKey = [1  1	 1	1	3	3
     8	1	1	1	1	1
     1	1	1	1	1	3
     1	1	1	1	1	1]';
-maskKey = maskKey(:);
+maskKeyCol = maskKeyCol(:);
 
 meanPercentCol = zeros(length(TC_files),1);
 stddevPercentCol = zeros(length(TC_files),1);
@@ -49,7 +49,7 @@ for fi = 1:length(TC_files)
     for ni = 1:length(tiles)
         disp(['Evaluating ',TC_files(fi,:),'_tri tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        eval(sprintf('tiles(%.1d).collagenBW,tiles(%.1d).collagenRGB = createCollagenMask%.1d(I);',ni,ni,maskKey(ni)));
+        eval(sprintf('tiles(%.1d).collagenBW,tiles(%.1d).collagenRGB = createCollagenMask%.1d(I);',ni,ni,maskKeyCol(ni)));
         tiles(ni).collagenCount   = sum(sum(tiles(ni).collagenBW));
         tiles(ni).collagenPercent = tiles(ni).collagenCount./(1024*1024);
         tiles(ni).collagenArea    = tiles(ni).collagenCount.*pixel_area;
@@ -71,6 +71,15 @@ RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
             'S14'; 'S28'; 'S30'; 'S31'; 'S46'; 'S62';... 
             'CO1'; 'CO2'; 'CO3'; 'CO4'; 'CO5'; 'CO6';...
             ];
+maskKeyRet = [1	2	3	1	2	1
+    1	3	1	3	1	1
+    1	1	4	3	1	1
+    1	3	1	3	4	3
+    1	2	2	1	1	1
+    1	2	1	1	1	1
+    1	1	1	1	1	1
+    1	3	3	3	3	3]';
+maskKeyRet = maskKeyRet(:);
 
 meanPercentRet = zeros(length(RT_files),1);
 stddevPercentRet = zeros(length(RT_files),1);
@@ -84,7 +93,7 @@ for fi = 1:length(RT_files)
      for ni = 1:length(tiles)
          disp(['Evaluating ',RT_files(fi,:),'_ret tile ',num2str(ni)])
          I = imread([path,tiles(ni).name]);
-         [tiles(ni).reticulinBW,tiles(ni).reticulinRGB] = createReticulinMask(I);
+         eval(sprintf('tiles(%.1d).reticulinBW,tiles(%.1d).reticulinRGB = createReticulinMask%.1d(I);',ni,ni,maskKeyRet(ni)));
          tiles(ni).reticulinCount   = sum(sum(tiles(ni).reticulinBW));
          tiles(ni).reticulinPercent = tiles(ni).reticulinCount./(1024*1024);
          tiles(ni).reticulinArea    = tiles(ni).reticulinCount.*pixel_area;

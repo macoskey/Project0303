@@ -66,10 +66,10 @@ for fi = 1:length(RT_files)
 end
 
 %%
-fi = 47;
+fi = 45;
 path = [main,'\',RT_files(fi,:),'_ret\'];
 I = imread([path,tiles(randi([1 225],1)).name]);
-[bw,rgb] = createReticulinMask(I);
+[bw,rgb] = createReticulinMask3(I);
 subplot(121), imagesc(I), axis equal tight
 subplot(122), imagesc(bw), colormap gray, axis equal tight
 title(RT_files(fi,:),'FontSize',24)
