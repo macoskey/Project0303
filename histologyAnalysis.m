@@ -13,17 +13,7 @@
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
 % I know this is awful - get over it:
-% TC_files = ['CO1';'CO2';'CO3';'CO4';'CO5';'CO6';...
-%             'S02';'S04';'S06';'S08';'S10';'S11';...
-%             'S14';'S15';'S17';'S20';'S21';'S23';...
-%             'S25';'S28';'S16';'S18';'S38';'S22';...
-%             'S24';'S26';'S30';'S32';'S35';'S39';...
-%             'S40';'S43';'S44';'S31';'S48';'S36';...
-%             'S52';'S41';'S57';'S45';'S46';'S49';...
-%             'S50';'S53';'S55';'S58';'S60';'S62';...
-%             ];
-
-files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
+TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
          'S04';	'S17'; 'S18'; 'S35'; 'S36'; 'S50';...
          'S06'; 'S20'; 'S38'; 'S39'; 'S52'; 'S53';...
          'S08';	'S21'; 'S22'; 'S40'; 'S41'; 'S55';... 
@@ -35,19 +25,19 @@ files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
 fileKey = repmat([30 60 100 200 300 500 1000 0]',6,1);
 
 
-meanPercentCol = zeros(length(files),1);
-stddevPercentCol = zeros(length(files),1);
+meanPercentCol = zeros(length(TC_files),1);
+stddevPercentCol = zeros(length(TC_files),1);
 
-for fi = 1:length(files)
-    path = [main,'\',files(fi,:),'_tri\'];
+for fi = 1:length(TC_files)
+    path = [main,'\',TC_files(fi,:),'_tri\'];
     tiles = dir([path,'Da*.jpg']);
     im_res      = 0.253;                    % microns per pixel (length)gnu
     pixel_area  = im_res^2;                 % microns^2 per pixel
     
     for ni = 1:length(tiles)
-        disp(['Evaluating ',files(fi,:),'_tri tile ',num2str(ni)])
+        disp(['Evaluating ',TC_files(fi,:),'_tri tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        if strcmp(files(fi,:),'S04') == 1
+        if strcmp(TC_files(fi,:),'S04') == 1
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_lite(I);
         else
             [tiles(ni).collagenBW,tiles(ni).collagenRGB] = createCollagenMask_norm(I);
@@ -59,32 +49,32 @@ for fi = 1:length(files)
     meanPercentCol(fi,1) = mean([tiles.collagenPercent]);
     stddevPercentCol(fi,1) = std([tiles.collagenPercent]);
     disp('saving...')
-    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',files(fi,:),'_tri_struct.mat'],'tiles')
+    save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',TC_files(fi,:),'_tri_struct.mat'],'tiles')
 end
 
-%% RETICULIN
-
+% RETICULIN
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-RT_files = ['CO1_ret';...
-         'S02_ret';...
-         'S04_ret';...
-         'S06_ret';...
-         'S08_ret';...
-         'S10_ret';...
-         'S11_ret';...
-         'S14_ret';...
-         ];
+RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
+            'S04'; 'S17'; 'S51'; 'S35'; 'S36'; 'S50';...
+            'S06'; 'S54'; 'S38'; 'S39'; 'S52'; 'S53';...
+            'S08'; 'S21'; 'S22'; 'S40'; 'S41'; 'S55';... 
+            'S10'; 'S23'; 'S24'; 'S43'; 'S57'; 'S58';... 
+            'S11'; 'S25'; 'S26'; 'S59'; 'S45'; 'S60';... 
+            'S14'; 'S28'; 'S30'; 'S31'; 'S46'; 'S62';... 
+            'CO1'; 'CO2'; 'CO3'; 'CO4'; 'CO5'; 'CO6';...
+            ];
+
 meanPercentRet = zeros(length(RT_files),1);
 stddevPercentRet = zeros(length(RT_files),1);
 
 for fi = 1:length(RT_files)
-     path = [main,'\',RT_files(fi,:),'\'];
+     path = [main,'\',RT_files(fi,:),'_ret\'];
      tiles = dir([path,'Da*.jpg']);
      im_res      = 0.253;                    % microns per pixel (length)
      pixel_area  = im_res^2;                 % microns^2 per pixel
 
      for ni = 1:length(tiles)
-         disp(['Evaluating ',RT_files(fi,:),' tile ',num2str(ni)])
+         disp(['Evaluating ',RT_files(fi,:),'_ret tile ',num2str(ni)])
          I = imread([path,tiles(ni).name]);
          [tiles(ni).reticulinBW,tiles(ni).reticulinRGB] = createReticulinMask(I);
          tiles(ni).reticulinCount   = sum(sum(tiles(ni).reticulinBW));
@@ -94,7 +84,7 @@ for fi = 1:length(RT_files)
      meanPercentRet(fi,1) = mean([tiles.reticulinPercent]);
      stddevPercentRet(fi,1) = std([tiles.reticulinPercent]);
      disp('saving...')
-     save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',RT_files(fi,:),'_struct.mat'],'tiles')
+     save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',RT_files(fi,:),'_ret_struct.mat'],'tiles')
 end
      
 %% RELOAD DATA
@@ -157,6 +147,8 @@ text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
 text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
+
+
 retData = meanPercentRet'.*100;
 retStddev = stddevPercentRet.*100';
 dose = [0 30 60 100 200 300 500 1000];
