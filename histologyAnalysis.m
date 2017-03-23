@@ -49,7 +49,7 @@ for fi = 1:length(TC_files)
     for ni = 1:length(tiles)
         disp(['Evaluating ',TC_files(fi,:),'_tri tile ',num2str(ni)])
         I = imread([path,tiles(ni).name]);
-        eval(sprintf('tiles(%.1d).collagenBW,tiles(%.1d).collagenRGB = createCollagenMask%.1d(I);',ni,ni,maskKeyCol(ni)));
+        eval(sprintf('[tiles(%.1d).collagenBW,tiles(%.1d).collagenRGB] = createCollagenMask%.1d(I);',ni,ni,maskKeyCol(fi)));
         tiles(ni).collagenCount   = sum(sum(tiles(ni).collagenBW));
         tiles(ni).collagenPercent = tiles(ni).collagenCount./(1024*1024);
         tiles(ni).collagenArea    = tiles(ni).collagenCount.*pixel_area;
@@ -93,7 +93,7 @@ for fi = 1:length(RT_files)
      for ni = 1:length(tiles)
          disp(['Evaluating ',RT_files(fi,:),'_ret tile ',num2str(ni)])
          I = imread([path,tiles(ni).name]);
-         eval(sprintf('tiles(%.1d).reticulinBW,tiles(%.1d).reticulinRGB = createReticulinMask%.1d(I);',ni,ni,maskKeyRet(ni)));
+         eval(sprintf('[tiles(%.1d).reticulinBW,tiles(%.1d).reticulinRGB] = createReticulinMask%.1d(I);',ni,ni,maskKeyRet(fi)));
          tiles(ni).reticulinCount   = sum(sum(tiles(ni).reticulinBW));
          tiles(ni).reticulinPercent = tiles(ni).reticulinCount./(1024*1024);
          tiles(ni).reticulinArea    = tiles(ni).reticulinCount.*pixel_area;
