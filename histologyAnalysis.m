@@ -12,6 +12,8 @@
 %% TRI-CHROME COLLAGEN
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
+addpath('E:\Research\Studies\Histology\DopBck_Study\threshFuncs')
+
 % I know this is awful - get over it:
 TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
          'S04';	'S17'; 'S18'; 'S35'; 'S36'; 'S50';...
@@ -22,25 +24,25 @@ TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
          'S14'; 'S28'; 'S30'; 'S31'; 'S46';	'S62';... 
          'CO1'; 'CO2'; 'CO3'; 'CO4'; 'CO5'; 'CO6';...
          ];
-fileKey = repmat([30 60 100 200 300 500 1000 0]',6,1);
+fileKey = repmat([30*ones(1,6) 60 100 200 300 500 1000 0]',1,6);
 
 % due to inconsistent histology protocol (both with staining and
 % potentially scanning), multiple color thresholders had to be made to
 % account for variabilities in the color spectra of the various samples.
-maskKeyCol = [1  1	 1	1	3	3	
-    2	4	1	1	4	1
-    1	1	3	4	6	6
+maskKeyCol = [1  1	 1	1	3	9	
+    2	4	1	1	4	9
+    1	1	3	4	6	9
     1	1	5	1	5	1
     1	1	5	1	6	7
     8	1	1	1	1	1
     1	1	1	1	1	3
-    1	1	1	1	1	1]';
+    1	1	1	1	1	9]';
 maskKeyCol = maskKeyCol(:);
 
-meanPercentCol = zeros(length(TC_files),1);
-stddevPercentCol = zeros(length(TC_files),1);
+%meanPercentCol = zeros(length(TC_files),1);
+%stddevPercentCol = zeros(length(TC_files),1);
 
-for fi = 1:length(TC_files)
+for fi = [6 12 18 24 30 36 42 48]
     path = [main,'\',TC_files(fi,:),'_tri\'];
     tiles = dir([path,'Da*.jpg']);
     im_res      = 0.253;                    % microns per pixel (length)gnu
@@ -60,7 +62,7 @@ for fi = 1:length(TC_files)
     save(['E:\Research\Studies\Histology\DopBck_Study\Structures\',TC_files(fi,:),'_tri_struct.mat'],'tiles')
 end
 
-% RETICULIN
+%% RETICULIN
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
 RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
             'S04'; 'S17'; 'S51'; 'S35'; 'S36'; 'S50';...
@@ -74,17 +76,17 @@ RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
 maskKeyRet = [1	2	3	1	2	1
     1	3	1	3	1	1
     1	1	4	3	1	1
-    1	3	1	3	4	3
-    1	2	2	1	1	1
-    1	2	1	1	1	1
+    1	5	1	3	4	3
+    1	2	5	1	1	1
+    1	5	1	1	1	1
     1	1	1	1	1	1
     1	3	3	3	3	3]';
 maskKeyRet = maskKeyRet(:);
 
-meanPercentRet = zeros(length(RT_files),1);
-stddevPercentRet = zeros(length(RT_files),1);
+%meanPercentRet = zeros(length(RT_files),1);
+%stddevPercentRet = zeros(length(RT_files),1);
 
-for fi = 1:length(RT_files)
+for fi = 20 % 1:length(RT_files)
      path = [main,'\',RT_files(fi,:),'_ret\'];
      tiles = dir([path,'Da*.jpg']);
      im_res      = 0.253;                    % microns per pixel (length)
@@ -111,8 +113,8 @@ reload_main = 'E:\Research\Studies\Histology\DopBck_Study\Structures';
 
 for fi = 1:length(TC_files)
     fprintf('loading file %.1d of %.1d... \n',fi,length(TC_files))
-    TC_path = [reload_main,'\',TC_files(fi,:),'_struct.mat'];
-    RT_path = [reload_main,'\',RT_files(fi,:),'_struct.mat'];
+    TC_path = [reload_main,'\',TC_files(fi,:),'_tri_struct.mat'];
+    RT_path = [reload_main,'\',RT_files(fi,:),'_ret_struct.mat'];
     TC_tmp = load(TC_path); RT_tmp = load(RT_path);
     for si = 1:length(TC_tmp.tiles)
         meanPercentCol(fi,1) = meanPercentCol(fi,1) + TC_tmp.tiles(si).collagenPercent;
@@ -165,9 +167,9 @@ text(700,10,'n = 6','FontSize',12);
 
 %% RETICULIN FIGURE
 
-retData = circshift(reshape(meanPercentRet,8,6).*100,1,1);
-retDose = [30 60 100 200 300 500 1000 0];
-retDose2 = circshift(repmat(retDose',1,6),1,1);
+retData = circshift(reshape(meanPercentRet.*100,6,8)',1,1);
+retDose = [30 60 100 200 300 500 1000 0].*ones(1,6)'; retDoseVec = retDose(:);
+retDose2 = circshift(reshape(retDoseVec,6,8)',1,1);
 
 % least-squares curve fit
 x0 = [0.1,0];
@@ -183,7 +185,7 @@ Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
 plot(doseFit,retFit,'k-','LineWidth',3), hold on
-plot(retDose,retData,'.','MarkerSize',40);
+plot(retDose2,retData,'.','MarkerSize',40);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
@@ -197,11 +199,11 @@ text(700,0.75,['R^2 = ',num2str(Rsq)],'FontSize',12);
 
 
 %% COLLAGEN FIGURE
-colData = circshift(reshape(meanPercentCol,8,6).*100,1,1);
+colData = circshift(reshape(meanPercentCol.*100,6,8)',1,1);
 colDose2 = retDose2;
 
 % least-squares curve fit
-x0 = [.01,0];
+x0 = [200,-.1];
 [doseFit,colFit] = nls_curve(colDose2,colData,x0);
 
 % residuals
@@ -218,7 +220,7 @@ plot(dose,colData,'.','MarkerSize',40);
 % err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Collagen Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
-xlim([-20 1020]), ylim([-0.25 6])
+xlim([-20 1020]), ylim([-0.25 8])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 1 2 3 4 5])
 set(gca,'FontSize',14)
@@ -228,7 +230,7 @@ text(700,1.2,['R^2 = ',num2str(Rsq)],'FontSize',12);
 
 %% ALL THREE
 figure(800), clf, set(800,'Position',[546 336 700 411]), set(gca,'FontSize',14)
-set(gca,'xscale','log')
+%set(gca,'xscale','log')
 xlabel 'Pulse Number'
 yyaxis left
     plot(doseFit,cellFit,'LineWidth',2), hold on
@@ -239,11 +241,11 @@ yyaxis left
 yyaxis right
     plot(doseFit,retFit,'LineWidth',2)
     plot(doseFit,colFit,'LineWidth',2)
-    ylim([0 2.5])
+    ylim([0 3.2])
     ytick([0 1 2 3])
     ylabel 'Percent Area Coverage'
 
-legend('Cell Count','Reticulin Area','Collagen Area','Location','SW');
+legend('Cell Count','Reticulin Area','Collagen Area','Location','NE');
 
 title 'Comparison of Histological Changes Throughout Treatment'
 

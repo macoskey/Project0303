@@ -10,7 +10,7 @@
 
 
 main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-
+addpath('E:\Research\Studies\Histology\DopBck_Study\threshFuncs')
 %% col/tri
 TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
             'S04'; 'S17'; 'S18'; 'S35'; 'S36'; 'S50';...
@@ -34,7 +34,7 @@ for fi = 1:length(TC_files)
 end
 
 %%
-fi = 42;
+fi = 6;
 path = [main,'\',TC_files(fi,:),'_tri\'];
 I = imread([path,tiles(randi([1 225],1)).name]);
 [bw,rgb] = createCollagenMask3(I);
@@ -66,10 +66,10 @@ for fi = 1:length(RT_files)
 end
 
 %%
-fi = 45;
+fi = 27;
 path = [main,'\',RT_files(fi,:),'_ret\'];
 I = imread([path,tiles(randi([1 225],1)).name]);
-[bw,rgb] = createReticulinMask3(I);
+[bw,rgb] = createReticulinMask2(I);
 subplot(121), imagesc(I), axis equal tight
 subplot(122), imagesc(bw), colormap gray, axis equal tight
 title(RT_files(fi,:),'FontSize',24)
