@@ -34,10 +34,10 @@ for fi = 1:length(TC_files)
 end
 
 %%
-fi = 48;
+fi = 17;
 path = [main,'\',TC_files(fi,:),'_tri\'];
 I = imread([path,tiles(randi([1 225],1)).name]);
-[bw,rgb] = createCollagenMask_norm(I);
+[bw,rgb] = createCollagenMask3(I);
 subplot(121), imagesc(I), axis equal tight
 subplot(122), imagesc(rgb), axis equal tight
 title(TC_files(fi,:),'FontSize',24)
