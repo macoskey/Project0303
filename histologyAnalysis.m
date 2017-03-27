@@ -150,20 +150,23 @@ SSres = sum(sum((meanCells - cellFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(500), clf, set(500,'Position',[546 336 1100 411])
-plot(doseFit,cellFit,'k-','LineWidth',3), hold on
-plot(dose,meanCells,'.','MarkerSize',20,'Color','k')
+plot(doseFit,cellFit,'r-','LineWidth',3), hold on
+plot(dose,meanCells,'k.','MarkerSize',25,'Color','k')
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
 
 title 'Non-Lysed Cells Remaining Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Cells per Tile'
-xlim([-20 1020]), ylim([0 170])
+xlim([-20 1020]), ylim([0 180])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 40 80 120 160])
 set(gca,'FontSize',14)
 
-legend('Nonlinear least-squares fit','Count \pm \sigma')
+legend('Nonlinear least-squares fit','Mean cells per tile')
 text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
 text(700,10,'n = 6','FontSize',12);
+saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.png')
+saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.fig')
+
 
 %% RETICULIN FIGURE
 
@@ -184,8 +187,8 @@ SSres = sum(sum((retData - retFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(600), clf, set(600,'Position',[546 336 1100 411])
-plot(doseFit,retFit,'k-','LineWidth',3), hold on
-plot(retDose2,retData,'.','MarkerSize',40);
+plot(doseFit,retFit,'r-','LineWidth',3), hold on
+plot(retDose2,retData,'k.','MarkerSize',25);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
@@ -196,6 +199,9 @@ set(gca,'FontSize',14)
 
 legend('Nonlinear least-squares fit','Percent Reticulin')
 text(700,0.75,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,0.45,'n = 6','FontSize',12);
+saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.png')
+saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.fig')
 
 
 %% COLLAGEN FIGURE
@@ -215,27 +221,30 @@ SSres = sum(sum((colData - colFit2).^2));
 Rsq = 1 - SSres/SStot;
 
 figure(700), clf, set(700,'Position',[546 336 1100 411])
-plot(doseFit,colFit,'LineWidth',3), hold on
-plot(dose,colData,'.','MarkerSize',40);
+plot(doseFit,colFit,'r','LineWidth',3), hold on
+plot(dose,colData,'k.','MarkerSize',25);
 % err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Collagen Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 8])
 xtick([0 30 60 100 200 300 500 1000])
-ytick([0 1 2 3 4 5])
+ytick([0 1 2 3 4 5 6 7 8])
 set(gca,'FontSize',14)
 
 legend('Nonlinear least-squares fit','Percent Collagen')
 text(700,1.2,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,0.75,'n = 6','FontSize',12);
+saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.png')
+saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.fig')
 
 %% ALL THREE
 figure(800), clf, set(800,'Position',[546 336 700 411]), set(gca,'FontSize',14)
-%set(gca,'xscale','log')
+set(gca,'xscale','log')
 xlabel 'Pulse Number'
 yyaxis left
     plot(doseFit,cellFit,'LineWidth',2), hold on
     ylabel 'Cells Remaining'
-    ylim([0 170])
+    ylim([0 180])
     ytick([0 40 80 120 160])
     
 yyaxis right
@@ -248,7 +257,8 @@ yyaxis right
 legend('Cell Count','Reticulin Area','Collagen Area','Location','NE');
 
 title 'Comparison of Histological Changes Throughout Treatment'
-
+saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.png')
+saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.fig')
 
 
 
