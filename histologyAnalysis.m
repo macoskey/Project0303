@@ -149,7 +149,7 @@ cellFit2 = cellFit(ones(1,6),dose + 1)';
 SSres = sum(sum((meanCells - cellFit2).^2));
 Rsq = 1 - SSres/SStot;
 
-figure(500), clf, set(500,'Position',[546 336 1100 411])
+figure(500), clf %, set(500,'Position',[546 336 1100 411])
 plot(doseFit,cellFit,'r-','LineWidth',3), hold on
 plot(dose,meanCells,'k.','MarkerSize',25,'Color','k')
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
@@ -186,11 +186,11 @@ retFit2 = retFit(ones(1,6),dose + 1)';
 SSres = sum(sum((retData - retFit2).^2));
 Rsq = 1 - SSres/SStot;
 
-figure(600), clf, set(600,'Position',[546 336 1100 411])
+figure(600), clf, %set(600,'Position',[546 336 1100 411])
 plot(doseFit,retFit,'r-','LineWidth',3), hold on
 plot(retDose2,retData,'k.','MarkerSize',25);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
-title 'Percent Area Covered by Reticulin Throughout Treatment'
+title 'Percent Area Covered by Reticulin'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 5])
 xtick([0 30 60 100 200 300 500 1000])
@@ -216,7 +216,7 @@ x0 = [200,-.1];
 datamean = mean(mean(colData));
 SStot = sum(sum((colData - datamean).^2));
 SSreg = sum((colFit(dose + 1) - datamean).^2);
-colFit2 = colFit(ones(1,6),dose + 1)';
+colFit2 = colFit(ones(1,6),dose + 1)'; % plus 1 because
 SSres = sum(sum((colData - colFit2).^2));
 Rsq = 1 - SSres/SStot;
 
@@ -238,25 +238,24 @@ saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCol
 saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.fig')
 
 %% ALL THREE
-figure(800), clf, set(800,'Position',[546 336 700 411]), set(gca,'FontSize',14)
+figure(800), clf, set(gca,'FontSize',14) %set(800,'Position',[546 336 700 411]), 
 set(gca,'xscale','log')
 xlabel 'Pulse Number'
 yyaxis left
-    plot(doseFit,cellFit,'LineWidth',2), hold on
-    ylabel 'Cells Remaining'
+    plot(doseFit,cellFit,'k:','LineWidth',2), hold on
+    ylabel('Cells Remaining','Color','k')
     ylim([0 180])
     ytick([0 40 80 120 160])
     
 yyaxis right
-    plot(doseFit,retFit,'LineWidth',2)
-    plot(doseFit,colFit,'LineWidth',2)
+    plot(doseFit,retFit,'k','LineWidth',2)
+    plot(doseFit,colFit,'k--','LineWidth',2)
     ylim([0 3.2])
     ytick([0 1 2 3])
-    ylabel 'Percent Area Coverage'
+    ylabel('Percent Area Coverage','Color','k')
 
-legend('Cell Count','Reticulin Area','Collagen Area','Location','NE');
-
-title 'Comparison of Histological Changes Throughout Treatment'
+legend('Cell Count','Reticulin Area','Collagen Area','Location','SW');
+title 'Histological Changes Throughout Treatment'
 saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.png')
 saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.fig')
 
