@@ -138,7 +138,7 @@ dose = [0 30 60 100 200 300 500 1000];
 dose2 = dose(ones(1,6),:)';
 
 % least-squares curve fit
-x0 = [200,-0.1];
+x0 = [200,-0.1 0 -0.1];
 [doseFit,cellFit] = nls_curve(dose2,meanCells,x0);
 
 % residuals
@@ -147,9 +147,9 @@ SStot = sum(sum((meanCells - datamean).^2));
 SSreg = sum((cellFit(dose + 1) - datamean).^2);
 cellFit2 = cellFit(ones(1,6),dose + 1)';
 SSres = sum(sum((meanCells - cellFit2).^2));
-Rsq = 1 - SSres/SStot;
+Rsq_cel = 1 - SSres/SStot;
 
-figure(500), clf %, set(500,'Position',[546 336 1100 411])
+figure(500), clf, set(500,'Position',[546 336 900 400])
 plot(doseFit,cellFit,'r-','LineWidth',3), hold on
 plot(dose,meanCells,'k.','MarkerSize',25,'Color','k')
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
@@ -160,9 +160,9 @@ xlim([-20 1020]), ylim([0 180])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 40 80 120 160])
 set(gca,'FontSize',14)
-
+xtickangle(-45)
 legend('Nonlinear least-squares fit','Mean cells per tile')
-text(700,20,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,20,['R^2 = ',num2str(Rsq_cel)],'FontSize',12);
 text(700,10,'n = 6','FontSize',12);
 saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.png')
 saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.fig')
@@ -175,7 +175,7 @@ retDose = [30 60 100 200 300 500 1000 0].*ones(1,6)'; retDoseVec = retDose(:);
 retDose2 = circshift(reshape(retDoseVec,6,8)',1,1);
 
 % least-squares curve fit
-x0 = [0.1,0];
+x0 = [0.1,0 0 -0.1];
 [doseFit,retFit] = nls_curve(retDose2,retData,x0);
 
 % residuals
@@ -184,9 +184,9 @@ SStot = sum(sum((retData - datamean).^2));
 SSreg = sum((retFit(retDose + 1) - datamean).^2);
 retFit2 = retFit(ones(1,6),dose + 1)';
 SSres = sum(sum((retData - retFit2).^2));
-Rsq = 1 - SSres/SStot;
+Rsq_ret = 1 - SSres/SStot;
 
-figure(600), clf, %set(600,'Position',[546 336 1100 411])
+figure(600), clf, set(600,'Position',[2000 336 900 400])
 plot(doseFit,retFit,'r-','LineWidth',3), hold on
 plot(retDose2,retData,'k.','MarkerSize',25);
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
@@ -196,9 +196,10 @@ xlim([-20 1020]), ylim([-0.25 5])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 1 2 3 4 5])
 set(gca,'FontSize',14)
+xtickangle(-45)
 
 legend('Nonlinear least-squares fit','Percent Reticulin')
-text(700,0.75,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,0.75,['R^2 = ',num2str(Rsq_ret)],'FontSize',12);
 text(700,0.45,'n = 6','FontSize',12);
 saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.png')
 saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.fig')
@@ -209,7 +210,7 @@ colData = circshift(reshape(meanPercentCol.*100,6,8)',1,1);
 colDose2 = retDose2;
 
 % least-squares curve fit
-x0 = [200,-.1];
+x0 = [100,-.00001 0 0];
 [doseFit,colFit] = nls_curve(colDose2,colData,x0);
 
 % residuals
@@ -218,21 +219,22 @@ SStot = sum(sum((colData - datamean).^2));
 SSreg = sum((colFit(dose + 1) - datamean).^2);
 colFit2 = colFit(ones(1,6),dose + 1)'; % plus 1 because
 SSres = sum(sum((colData - colFit2).^2));
-Rsq = 1 - SSres/SStot;
+Rsq_col = 1 - SSres/SStot;
 
-figure(700), clf, set(700,'Position',[546 336 1100 411])
+figure(700), clf, set(700,'Position',[2000 336 900 400])
 plot(doseFit,colFit,'r','LineWidth',3), hold on
 plot(dose,colData,'k.','MarkerSize',25);
 % err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
-title 'Percent Area Covered by Collagen Throughout Treatment'
+title 'Percent Area Covered by Collagen'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 8])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 1 2 3 4 5 6 7 8])
 set(gca,'FontSize',14)
+xtickangle(-45)
 
 legend('Nonlinear least-squares fit','Percent Collagen')
-text(700,1.2,['R^2 = ',num2str(Rsq)],'FontSize',12);
+text(700,1.2,['R^2 = ',num2str(Rsq_col)],'FontSize',12);
 text(700,0.75,'n = 6','FontSize',12);
 saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.png')
 saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.fig')
@@ -242,22 +244,98 @@ figure(800), clf, set(gca,'FontSize',14) %set(800,'Position',[546 336 700 411]),
 set(gca,'xscale','log')
 xlabel 'Pulse Number'
 yyaxis left
-    plot(doseFit,cellFit,'k:','LineWidth',2), hold on
-    ylabel('Cells Remaining','Color','k')
-    ylim([0 180])
+    plot(doseFit,cellFit,'LineWidth',2), hold on
+    ylabel('Cells Remaining')
+    ylim([0 170])
     ytick([0 40 80 120 160])
     
 yyaxis right
-    plot(doseFit,retFit,'k','LineWidth',2)
-    plot(doseFit,colFit,'k--','LineWidth',2)
-    ylim([0 3.2])
+    plot(doseFit,retFit,'LineWidth',2)
+    plot(doseFit,colFit,'LineWidth',2)
+    ylim([0 3.3])
     ytick([0 1 2 3])
-    ylabel('Percent Area Coverage','Color','k')
+    ylabel('Percent Area Coverage')
 
+xlim([0 1000])
 legend('Cell Count','Reticulin Area','Collagen Area','Location','SW');
 title 'Histological Changes Throughout Treatment'
 saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.png')
 saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.fig')
+
+%% ALL THREE SUBPLOT
+hand=figure('Name', 'subplot_tight');
+set(hand,'Position',[2046 336 750 600])
+marg = [0.05 0.08];
+fontSize = 12;
+markSize = 20;
+
+% cells
+subplot_tight(3,1,1,marg)
+plot(doseFit,cellFit,'r-','LineWidth',3), hold on
+plot(dose,meanCells,'k.','MarkerSize',markSize,'Color','k')
+
+ylabel 'Cells per Tile'
+xlim([0 1000]), ylim([0 180])
+xtick([0 30 60 100 200 300 500 1000])
+ytick([0 40 80 120 160])
+set(gca,'FontSize',fontSize)
+legend('Nonlinear least-squares fit','Cell Count')
+
+str1 = sprintf('R^2 = %.2f',Rsq_cel);
+text(700,35,str1,'FontSize',12);
+text(700,18.5,'n = 6','FontSize',12);
+
+
+% retic
+subplot_tight(3,1,2,marg)
+plot(doseFit,retFit,'r-','LineWidth',3), hold on
+plot(retDose2,retData,'k.','MarkerSize',markSize);
+
+ylabel 'Reticulin Area(%)'
+xlim([0 1000]), ylim([-0.25 5])
+xtick([0 30 60 100 200 300 500 1000])
+ytick([0 1 2 3 4 5])
+set(gca,'FontSize',fontSize)
+legend('Nonlinear least-squares fit','Percent Reticulin')
+
+str2 = sprintf('R^2 = %.2f',Rsq_ret);
+text(700,1,str2,'FontSize',12);
+text(700,0.5,'n = 6','FontSize',12);
+
+
+% coll
+subplot_tight(3,1,3,[0.09 marg(2)])
+plot(doseFit,colFit,'r-','LineWidth',3), hold on
+plot(dose,colData,'k.','MarkerSize',markSize);
+
+xlabel 'Pulse Number', ylabel 'Collagen Area (%)'
+xlim([0 1000]), ylim([-0.25 8])
+xtick([0 30 60 100 200 300 500 1000])
+ytick([0 2 4 6 8])
+set(gca,'FontSize',fontSize)
+legend('Nonlinear least-squares fit','Percent Collagen')
+
+str3 = sprintf('R^2 = %.2f',Rsq_col);
+text(700,2,str3,'FontSize',12);
+text(700,1,'n = 6','FontSize',12);
+
+saveas(hand,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThree_subplot.png')
+saveas(hand,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThree_subplot.fig')
+
+
+
+%% time constants
+cell63 = max(cellFit).*(1/exp(1));
+col63 = max(colFit).*(1/exp(1));
+ret63 = max(retFit).*(1/exp(1));
+
+cell_tc = find(abs(cellFit-cell63) < 1);
+col_tc = find(abs(colFit-col63) < 0.005);
+ret_tc = find(abs(retFit-ret63) < 0.005);
+
+fprintf('cell tau = %.f \ncoll tau = %.f \nretic_tau = %.f \n',cell_tc(1),col_tc(1),ret_tc(1))
+
+
 
 
 
