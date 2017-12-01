@@ -11,8 +11,8 @@
 
 %% TRI-CHROME COLLAGEN
 
-main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
-addpath('E:\Research\Studies\Histology\DopBck_Study\threshFuncs')
+main = 'E:\Box Sync\Research\Studies\0303_20171215\TiledSamples';
+% addpath('E:\Box Sync\Research\Studies\0403_20171215\threshFuncs')
 
 % I know this is awful - get over it:
 TC_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
@@ -63,7 +63,7 @@ for fi = [6 12 18 24 30 36 42 48]
 end
 
 %% RETICULIN
-main = 'E:\Research\Studies\Histology\DopBck_Study\TiledSamples';
+main = 'E:\Box Sync\Research\Studies\0303_20171215\TiledSamples';
 RT_files = ['S02'; 'S15'; 'S16'; 'S32'; 'S48'; 'S49';...
             'S04'; 'S17'; 'S51'; 'S35'; 'S36'; 'S50';...
             'S06'; 'S54'; 'S38'; 'S39'; 'S52'; 'S53';...
@@ -109,7 +109,7 @@ end
 %% RELOAD DATA
 meanPercentCol = zeros(length(TC_files),1); stddevPercentCol = zeros(length(TC_files),1);
 meanPercentRet = zeros(length(RT_files),1); stddevPercentRet = zeros(length(RT_files),1);
-reload_main = 'E:\Research\Studies\Histology\DopBck_Study\Structures';
+reload_main = 'E:\Box Sync\Research\Studies\0303_20171215\Structures';
 
 for fi = 1:length(TC_files)
     fprintf('loading file %.1d of %.1d... \n',fi,length(TC_files))
@@ -124,6 +124,10 @@ for fi = 1:length(TC_files)
     meanPercentRet(fi,1) = meanPercentRet(fi,1)./si;
 end
 fprintf('complete \n')
+
+%% QUICK RELOAD
+load('E:\Box Sync\Research\Studies\0303_20171215\d0403_reloadedRawData.mat')
+
 %% CELL COUNT FIGURE
 
 meanCells = [149.9	175.5	180.6	165.9	167.7	171.3
@@ -147,25 +151,31 @@ SStot = sum(sum((meanCells - datamean).^2));
 SSreg = sum((cellFit(dose + 1) - datamean).^2);
 cellFit2 = cellFit(ones(1,6),dose + 1)';
 SSres = sum(sum((meanCells - cellFit2).^2));
-Rsq_cel = 1 - SSres/SStot;
+Rsq_cel = round((1 - SSres/SStot)*100)/100;
 
+clf
 figure(500), clf, set(500,'Position',[546 336 900 400])
-plot(doseFit,cellFit,'r-','LineWidth',3), hold on
-plot(dose,meanCells,'k.','MarkerSize',25,'Color','k')
+plot(dose,meanCells,'.','Color',[0.3 0.3 0.3],'MarkerSize',25), hold on
+plot(doseFit,cellFit,'k-','LineWidth',3)
 % err = errorbar(dose,meanCells,stddevCells,'.','MarkerSize',40,'LineWidth',2);
 
 title 'Non-Lysed Cells Remaining Throughout Treatment'
 xlabel 'Pulse Number', ylabel 'Mean Cells per Tile'
-xlim([-20 1020]), ylim([0 180])
+xlim([-20 1020]), ylim([-5 180])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 40 80 120 160])
-set(gca,'FontSize',14)
-xtickangle(-45)
-legend('Nonlinear least-squares fit','Mean cells per tile')
-text(700,20,['R^2 = ',num2str(Rsq_cel)],'FontSize',12);
-text(700,10,'n = 6','FontSize',12);
-saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.png')
-saveas(500,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\cellCount.fig')
+box on
+grid on
+set(gca,'GridLineStyle','--')
+set(gca,'LineWidth',1.5)
+set(gca,'FontSize',20)
+xtickangle(-90)
+
+[h,p,stats] = chi2gof(mean(meanCells'),'nbins',2,'cdf',@normcdf)
+text(800,30,['R^2 = ',num2str(Rsq_cel)],'FontSize',12);
+text(800,15,'p < 0.001','FontSize',12);
+% saveas(500,'E:\Box Sync\Research\Studies\0302_20171215\Figures\cellCount.png')
+% saveas(500,'E:\Box Sync\Research\Studies\0302_20171215\Figures\cellCount.fig')
 
 
 %% RETICULIN FIGURE
@@ -184,25 +194,29 @@ SStot = sum(sum((retData - datamean).^2));
 SSreg = sum((retFit(retDose + 1) - datamean).^2);
 retFit2 = retFit(ones(1,6),dose + 1)';
 SSres = sum(sum((retData - retFit2).^2));
-Rsq_ret = 1 - SSres/SStot;
+Rsq_ret = round((1 - SSres/SStot)*100)/100;
 
 figure(600), clf, set(600,'Position',[2000 336 900 400])
-plot(doseFit,retFit,'r-','LineWidth',3), hold on
-plot(retDose2,retData,'k.','MarkerSize',25);
+plot(retDose2,retData,'.','Color',[0.3 0.3 0.3],'MarkerSize',25), hold on;
+plot(doseFit,retFit,'k-','LineWidth',3)
 % err = errorbar(dose,retData,retStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Reticulin'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 5])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 1 2 3 4 5])
-set(gca,'FontSize',14)
+box on
+grid on
+set(gca,'GridLineStyle','--')
+set(gca,'LineWidth',1.5)
+set(gca,'FontSize',20)
 xtickangle(-45)
 
-legend('Nonlinear least-squares fit','Percent Reticulin')
-text(700,0.75,['R^2 = ',num2str(Rsq_ret)],'FontSize',12);
-text(700,0.45,'n = 6','FontSize',12);
-saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.png')
-saveas(600,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\reticulin.fig')
+[h,p_ret,stats] = chi2gof(mean(retData'),'nbins',2,'cdf',@normcdf);
+text(800,1.25,['R^2 = ',num2str(Rsq_ret)],'FontSize',12);
+text(800,0.8,'p = 0.013','FontSize',12);
+% saveas(600,'E:\Box Sync\Research\Studies\0302_20171215\Figures\reticulin.png')
+% saveas(600,'E:\Box Sync\Research\Studies\0302_20171215\Figures\reticulin.fig')
 
 
 %% COLLAGEN FIGURE
@@ -219,25 +233,29 @@ SStot = sum(sum((colData - datamean).^2));
 SSreg = sum((colFit(dose + 1) - datamean).^2);
 colFit2 = colFit(ones(1,6),dose + 1)'; % plus 1 because
 SSres = sum(sum((colData - colFit2).^2));
-Rsq_col = 1 - SSres/SStot;
+Rsq_col = round((1 - SSres/SStot)*100)/100;
 
 figure(700), clf, set(700,'Position',[2000 336 900 400])
-plot(doseFit,colFit,'r','LineWidth',3), hold on
-plot(dose,colData,'k.','MarkerSize',25);
+plot(dose,colData,'.','Color',[0.3 0.3 0.3],'MarkerSize',25), hold on;
+plot(doseFit,colFit,'k','LineWidth',3)
 % err = errorbar(dose,colData,colStddev,'.','MarkerSize',40,'LineWidth',2);
 title 'Percent Area Covered by Collagen'
 xlabel 'Pulse Number', ylabel 'Mean Percent Area Covered'
 xlim([-20 1020]), ylim([-0.25 8])
 xtick([0 30 60 100 200 300 500 1000])
 ytick([0 1 2 3 4 5 6 7 8])
-set(gca,'FontSize',14)
-xtickangle(-45)
+box on
+grid on
+set(gca,'GridLineStyle','--')
+set(gca,'LineWidth',1.5)
+set(gca,'FontSize',20)
+xtickangle(-70)
 
-legend('Nonlinear least-squares fit','Percent Collagen')
-text(700,1.2,['R^2 = ',num2str(Rsq_col)],'FontSize',12);
-text(700,0.75,'n = 6','FontSize',12);
-saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.png')
-saveas(700,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\triChromeCollagen.fig')
+[h,p,stats] = chi2gof(mean(colData'),'nbins',2,'cdf',@normcdf);
+text(800,1.5,['R^2 = ',num2str(Rsq_col)],'FontSize',12);
+text(800,0.75,'p < 0.001','FontSize',12);
+% saveas(700,'E:\Box Sync\Research\Studies\0302_20171215\Figures\triChromeCollagen.png')
+% saveas(700,'E:\Box Sync\Research\Studies\0302_20171215\Figures\triChromeCollagen.fig')
 
 %% ALL THREE
 figure(800), clf, set(gca,'FontSize',14) %set(800,'Position',[546 336 700 411]), 
@@ -257,14 +275,16 @@ yyaxis right
     ylabel('Percent Area Coverage')
 
 xlim([0 1000])
+box on
+set(gca,'LineWidth',3)
 legend('Cell Count','Reticulin Area','Collagen Area','Location','SW');
 title 'Histological Changes Throughout Treatment'
-saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.png')
-saveas(800,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThreeLog.fig')
+saveas(800,'E:\Box Sync\Research\Studies\0302_20171215\Figures\allThreeLog.png')
+saveas(800,'E:\Box Sync\Research\Studies\0302_20171215\Figures\allThreeLog.fig')
 
 %% ALL THREE SUBPLOT
 hand=figure('Name', 'subplot_tight');
-set(hand,'Position',[2046 336 750 600])
+set(hand,'Position',[2046 50 750 600])
 marg = [0.05 0.08];
 fontSize = 12;
 markSize = 20;
@@ -283,7 +303,7 @@ legend('Nonlinear least-squares fit','Cell Count')
 
 str1 = sprintf('R^2 = %.2f',Rsq_cel);
 text(700,35,str1,'FontSize',12);
-text(700,18.5,'n = 6','FontSize',12);
+text(700,18.5,'p < 0.001','FontSize',12);
 
 
 % retic
@@ -299,8 +319,8 @@ set(gca,'FontSize',fontSize)
 legend('Nonlinear least-squares fit','Percent Reticulin')
 
 str2 = sprintf('R^2 = %.2f',Rsq_ret);
-text(700,1,str2,'FontSize',12);
-text(700,0.5,'n = 6','FontSize',12);
+text(700,1.2,str2,'FontSize',12);
+text(700,0.7,'p < 0.001','FontSize',12);
 
 
 % coll
@@ -316,24 +336,33 @@ set(gca,'FontSize',fontSize)
 legend('Nonlinear least-squares fit','Percent Collagen')
 
 str3 = sprintf('R^2 = %.2f',Rsq_col);
-text(700,2,str3,'FontSize',12);
-text(700,1,'n = 6','FontSize',12);
+text(700,2.5,str3,'FontSize',12);
+text(700,1.5,'p < 0.001','FontSize',12);
 
-saveas(hand,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThree_subplot.png')
-saveas(hand,'E:\Research\Studies\Histology\DopBck_Study\Figures\AIUM\allThree_subplot.fig')
+saveas(hand,'E:\Box Sync\Research\Studies\0402_20171215\Figures\allThree_subplot.png')
+saveas(hand,'E:\Box Sync\Research\Studies\0402_20171215\Figures\allThree_subplot.fig')
 
 
 
 %% time constants
-cell63 = max(cellFit).*(1/exp(1));
-col63 = max(colFit).*(1/exp(1));
-ret63 = max(retFit).*(1/exp(1));
+cell63 = max(cellFit)./exp(1);
+col63 = max(colFit)./exp(1);
+ret63 = max(retFit)./exp(1);
+
+ACE1_63 = max(envFit)./exp(1);
+ACE2_63 = max(lagsFit).*(1-1/exp(1));
+ACE3_63 = max(corrFit)./exp(1);
 
 cell_tc = find(abs(cellFit-cell63) < 1);
 col_tc = find(abs(colFit-col63) < 0.005);
 ret_tc = find(abs(retFit-ret63) < 0.005);
 
-fprintf('cell tau = %.f \ncoll tau = %.f \nretic_tau = %.f \n',cell_tc(1),col_tc(1),ret_tc(1))
+ACE1_tc = find(abs(envFit-ACE1_63) < 0.01);
+ACE2_tc = find(abs(lagsFit-ACE2_63) < 0.0005);
+ACE3_tc = find(abs(corrFit-ACE3_63) < 0.1);
+
+fprintf('cell tau = %.f \ncoll tau = %.f \nretic tau = %.f \n',cell_tc(1),col_tc(1),ret_tc(1))
+fprintf('max tau = %.f \nlags tau = %.f \ncorr tau = %.f \n',ACE1_tc(1),ACE2_tc(1),inf)
 
 
 
